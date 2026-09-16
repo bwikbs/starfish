@@ -749,13 +749,36 @@ UTF8StringDataNonGCStd A11yAtspiTreeSource::textOf(void* handle)
     return value->toUTF8NonGCString();
 }
 
-void A11yAtspiTreeSource::scrollBy(double dx, double dy)
+void A11yAtspiTreeSource::scrollBy(void* handle, double dx, double dy)
 {
-    BrowsingContext* bc = webView()->mainBrowsingContext();
-    if (!bc) {
-        return;
+    Element* element = toElement(handle);
+    while (element) {
+        Document* document = element->ownerDocument();
+        for (Element* current = element; current;
+             current = current->parentElement()) {
+            double left = current->scrollLeftProperty();
+            double top = current->scrollTopProperty();
+            current->scrollBy(dx, dy);
+            // Hand on only what this box had no room for, per axis, the way
+            // scroll chaining carries a touch drag out of a list that has
+            // hit its end (or that only scrolls the other way). The document
+            // rides along as its root element, whose scroll properties are
+            // the viewport's.
+            dx -= current->scrollLeftProperty() - left;
+            dy -= current->scrollTopProperty() - top;
+            if (dx > -1 && dx < 1 && dy > -1 && dy < 1) {
+                return;
+            }
+        }
+        BrowsingContext* bc = document ? document->browsingContext() : nullptr;
+        element = (bc && bc->parentBrowsingContext()) ? bc->sourceElement()
+                                                     : nullptr;
     }
-    bc->window()->scrollBy(dx, dy);
+    // Nothing exposed under the fingers: scroll the top-level document.
+    BrowsingContext* bc = webView()->mainBrowsingContext();
+    if (bc) {
+        bc->window()->scrollBy(dx, dy);
+    }
 }
 
 A11yAtspiTreeSource::States A11yAtspiTreeSource::statesOf(void* handle)

@@ -1307,8 +1307,7 @@ static dbus_bool_t handleA11yGesture(dbus_int32_t type, dbus_int32_t beginX,
         // box, not in the top-level document.
         double clientX = 0, clientY = 0;
         toClientCss(endX, endY, ATK_XY_SCREEN, clientX, clientY);
-        source->scrollBy(source->hitTest(clientX, clientY), -deltaX / dpr,
-                         -deltaY / dpr);
+        source->scrollBy(clientX, clientY, -deltaX / dpr, -deltaY / dpr);
         updateFocusRing();
     }
     return TRUE;

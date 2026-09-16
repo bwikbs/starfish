@@ -87,11 +87,11 @@ public:
     // Editable text content (input/textarea value) for Entry targets, UTF-8.
     // Empty for non-editable targets.
     UTF8StringDataNonGCStd textOf(void* handle);
-    // Two-finger pan gesture: scroll by CSS px, starting at the box under
-    // the fingers (the hitTest handle, which may be null) and walking out
-    // through its ancestors and enclosing iframes to the first scroller with
-    // room left, the way a touch drag scrolls the box it starts in.
-    void scrollBy(void* handle, double dx, double dy);
+    // Two-finger pan gesture: scroll by CSS px, starting at the box at the
+    // given top-level viewport point and walking out through its ancestors
+    // and enclosing iframes to the scrollers with room left, the way a touch
+    // drag scrolls the box it starts in.
+    void scrollBy(double clientX, double clientY, double dx, double dy);
     // Border box in CSS px relative to the top-level viewport, CLIPPED by
     // every ancestor overflow box and each enclosing frame's viewport
     // (chromium reports clipped bounds the same way). A fully clipped

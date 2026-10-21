@@ -2486,11 +2486,13 @@ Apps relying on the right-hand list get **no protection** — the directive is p
 
 `EXT_texture_filter_anisotropic`, `OES_texture_float_linear`.
 
+`WEBGL_debug_renderer_info` is offered to WebGL 1 and WebGL 2 contexts regardless of the driver; `UNMASKED_VENDOR_WEBGL` / `UNMASKED_RENDERER_WEBGL` return the driver's `GL_VENDOR` / `GL_RENDERER` strings.
+
 Compressed textures: `WEBGL_compressed_texture_astc` (driver advertises `GL_KHR_texture_compression_astc_ldr`; `getSupportedProfiles()` adds `"hdr"` with `GL_KHR_texture_compression_astc_hdr`) and `WEBGL_compressed_texture_etc` (OpenGL ES 3.0 context, where ETC2/EAC is core, or `GL_ARB_ES3_compatibility`).
 
-Version-specific: Promoted extensions (`EXT_blend_minmax`, `OES_standard_derivatives`, `OES_texture_float`, `OES_texture_half_float`, `OES_vertex_array_object`, `WEBGL_depth_texture`, `OES_element_index_uint`, `ANGLE_instanced_arrays`) are exposed to WebGL 1 contexts only (all are core in WebGL 2), and `EXT_color_buffer_float` and `EXT_disjoint_timer_query_webgl2` to WebGL 2 contexts only. All three are also reported when the driver makes the feature core (ES 3.0 / desktop GL 3.x) without advertising the `GL_*` token.
+Version-specific: Promoted extensions (`EXT_blend_minmax`, `OES_standard_derivatives`, `OES_texture_float`, `OES_texture_half_float`, `OES_vertex_array_object`, `WEBGL_depth_texture`, `OES_element_index_uint`, `ANGLE_instanced_arrays`) are exposed to WebGL 1 contexts only (all are core in WebGL 2), and `EXT_color_buffer_float` to WebGL 2 contexts only. `OES_element_index_uint` and `ANGLE_instanced_arrays` are also reported when the driver makes the feature core (ES 3.0 / desktop GL 3.x), and `EXT_color_buffer_float` on desktop GL 3.x, without advertising the `GL_*` token.
 
-**Common extensions NOT implemented** (will return `null`): `WEBGL_lose_context`, `WEBGL_debug_renderer_info`, `WEBGL_compressed_texture_*` other than astc/etc (s3tc/s3tc_srgb/etc1/pvrtc), `EXT_texture_compression_bptc`/`rgtc`, `OES_texture_half_float_linear`, `EXT_sRGB`, `KHR_parallel_shader_compile`.
+**Common extensions NOT implemented** (will return `null`): `WEBGL_lose_context`, `EXT_disjoint_timer_query`/`EXT_disjoint_timer_query_webgl2`, `WEBGL_compressed_texture_*` other than astc/etc (s3tc/s3tc_srgb/etc1/pvrtc), `EXT_texture_compression_bptc`/`rgtc`, `OES_texture_half_float_linear`, `EXT_sRGB`, `KHR_parallel_shader_compile`.
 
 ### Performance
 

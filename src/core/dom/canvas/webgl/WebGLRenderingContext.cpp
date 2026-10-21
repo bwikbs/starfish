@@ -72,6 +72,7 @@
 #include <EscargotPublic.h>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 
 #define kMaximumUniformAndAttributeLocationLengths 256
 #define kMaximumSupportedStride 255
@@ -82,6 +83,8 @@ static const GLenum kUNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
 static const GLenum kCONTEXT_LOST_WEBGL = 0x9242;
 static const GLenum kUNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 static const GLenum kBROWSER_DEFAULT_WEBGL = 0x9244;
+static const GLenum kUNMASKED_VENDOR_WEBGL = 0x9245;
+static const GLenum kUNMASKED_RENDERER_WEBGL = 0x9246;
 static const GLenum kIMPLEMENTATION_COLOR_READ_TYPE = 0x8B9A;
 static const GLenum kIMPLEMENTATION_COLOR_READ_FORMAT = 0x8B9B;
 
@@ -2350,6 +2353,19 @@ ScriptValue WebGLRenderingContext::getParameter(GLenum pname)
         const std::string output =
             reinterpret_cast<const char*>(glGetString(pname));
         return StringRef::createFromASCII(output.c_str(), output.length());
+    }
+    case kUNMASKED_VENDOR_WEBGL:
+    case kUNMASKED_RENDERER_WEBGL: {
+        if (!isExtensionEnabled("WEBGL_debug_renderer_info")) {
+            setGLError(GL_INVALID_ENUM);
+            return scriptNull();
+        }
+        const char* output = reinterpret_cast<const char*>(m_gl->getString(
+            pname == kUNMASKED_VENDOR_WEBGL ? GL_VENDOR : GL_RENDERER));
+        if (!output) {
+            return scriptNull();
+        }
+        return StringRef::createFromASCII(output, strlen(output));
     }
     // GLboolean
     case GL_BLEND:

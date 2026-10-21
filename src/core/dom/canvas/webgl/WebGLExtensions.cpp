@@ -123,19 +123,20 @@ void WebGLExtensionRegistry::initialize(GL* gl)
 
     // 2. Add generators for extensions not requiring binding to native objects
 
-#define SUPPORTED_GL_EXTENSIONS(V)                                           \
-    V(OES_texture_float, OES_texture_float, WebGL1Only, false)               \
-    V(OES_texture_half_float, OES_texture_half_float, WebGL1Only, false)     \
-    V(OES_standard_derivatives, OES_standard_derivatives, WebGL1Only, false) \
-    V(OES_depth_texture, WEBGL_depth_texture, WebGL1Only, false)             \
-    V(EXT_texture_filter_anisotropic, EXT_texture_filter_anisotropic,        \
-      AnyVersion, false)                                                     \
-    V(OES_texture_float_linear, OES_texture_float_linear, AnyVersion, false) \
-    V(EXT_blend_minmax, EXT_blend_minmax, WebGL1Only, false)                 \
-    V(OES_element_index_uint, OES_element_index_uint, WebGL1Only,            \
-      isCoreProfile3)                                                        \
-    V(EXT_color_buffer_float, EXT_color_buffer_float, WebGL2Only,            \
-      (isDesktopGL && isCoreProfile3))                                       \
+#define SUPPORTED_GL_EXTENSIONS(V)                                            \
+    V(OES_texture_float, OES_texture_float, WebGL1Only, false)                \
+    V(OES_texture_half_float, OES_texture_half_float, WebGL1Only, false)      \
+    V(OES_standard_derivatives, OES_standard_derivatives, WebGL1Only, false)  \
+    V(OES_depth_texture, WEBGL_depth_texture, WebGL1Only, false)              \
+    V(EXT_texture_filter_anisotropic, EXT_texture_filter_anisotropic,         \
+      AnyVersion, false)                                                      \
+    V(OES_texture_float_linear, OES_texture_float_linear, AnyVersion, false)  \
+    V(EXT_blend_minmax, EXT_blend_minmax, WebGL1Only, false)                  \
+    V(OES_element_index_uint, OES_element_index_uint, WebGL1Only,             \
+      isCoreProfile3)                                                         \
+    V(EXT_color_buffer_float, EXT_color_buffer_float, WebGL2Only,             \
+      (isDesktopGL && isCoreProfile3))                                        \
+    V(WEBGL_debug_renderer_info, WEBGL_debug_renderer_info, AnyVersion, true) \
     V(ARB_ES3_compatibility, WEBGL_compressed_texture_etc, AnyVersion, hasETC2)
 
 #define V(name, spec, availability, alsoSupportedWhen)                    \

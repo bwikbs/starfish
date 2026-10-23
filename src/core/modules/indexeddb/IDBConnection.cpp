@@ -84,9 +84,14 @@ void IDBConnection::openDatabase(IDBConnectionData* connectionData,
         // TODO: 10. If db’s version is less than version, then:
         dbVersion = data->version.getValue();
         std::string versionString = std::to_string(dbVersion);
-        storageKey->setItem(data->name,
-                            String::createASCIIString(versionString.c_str(),
-                                                      versionString.length()));
+        // The map lives in this thread's collector (GC_THREAD_ISOLATE), but
+        // data->name belongs to the requesting thread's heap and is collected
+        // there once the request completes, so key the map with our own copy.
+        std::string nameString = data->name->toUTF8NonGCString();
+        storageKey->setItem(
+            String::fromUTF8(nameString.c_str(), nameString.length()),
+            String::createASCIIString(versionString.c_str(),
+                                      versionString.length()));
 
         data->upgradeNeeded = true;
     }

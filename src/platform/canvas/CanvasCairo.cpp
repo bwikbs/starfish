@@ -60,6 +60,7 @@
 #else
 #include <cairo/cairo-ft.h>
 #endif
+#include <fontconfig/fcfreetype.h>
 
 #include <hb.h>
 
@@ -2513,6 +2514,25 @@ private:
     }
 #endif
 
+    // CSS Fonts 4 font-synthesis-weight: a bold request (600 or more) on a
+    // face lighter than that is drawn emboldened, as Blink does; advances
+    // stay those of the face. The emboldened face comes from a pattern so
+    // cairo caches it apart from the plain face of the same FT_Face.
+    cairo_font_face_t* createCairoFontFace(FontFaceImplCairo* fontFace)
+    {
+        if (lastState()->m_font->weight() < 6 || fontFace->m_isBold) {
+            return cairo_ft_font_face_create_for_ft_face(
+                fontFace->freetypeFace(), 0);
+        }
+        FcPattern* pattern = FcPatternCreate();
+        FcPatternAddFTFace(pattern, FC_FT_FACE, fontFace->freetypeFace());
+        FcPatternAddBool(pattern, FC_EMBOLDEN, FcTrue);
+        cairo_font_face_t* face =
+            cairo_ft_font_face_create_for_pattern(pattern);
+        FcPatternDestroy(pattern);
+        return face;
+    }
+
     void drawGlyphs(cairo_t* canvas, FontFaceImplCairo* fontFace,
                     const cairo_matrix_t& sizeMatrix,
                     const cairo_matrix_t& identityMatrix, cairo_glyph_t* glyphs,
@@ -2520,8 +2540,7 @@ private:
     {
         STARFISH_ASSERT(canvas != nullptr);
         STARFISH_ASSERT(glyphs != nullptr);
-        cairo_font_face_t* cairofontFace =
-            cairo_ft_font_face_create_for_ft_face(fontFace->freetypeFace(), 0);
+        cairo_font_face_t* cairofontFace = createCairoFontFace(fontFace);
 
         FontFaceReferenceHolder* holder =
             new (NoGC) FontFaceReferenceHolder(fontFace);
@@ -2579,8 +2598,7 @@ private:
         STARFISH_ASSERT(canvas != nullptr);
         STARFISH_ASSERT(glyphs != nullptr);
 
-        cairo_font_face_t* cairofontFace =
-            cairo_ft_font_face_create_for_ft_face(fontFace->freetypeFace(), 0);
+        cairo_font_face_t* cairofontFace = createCairoFontFace(fontFace);
 
         FontFaceReferenceHolder* holder =
             new (NoGC) FontFaceReferenceHolder(fontFace);

@@ -165,6 +165,30 @@ IntrinsicSizeUsedInLayout FrameReplaced::computeIntrinsicSizeForLayout()
     return result;
 }
 
+// An img's width and height attributes map to the 'width' and 'height'
+// properties (HTML 15.4.3), so when CSS sets only one axis the other still
+// takes its attribute. Both-auto is left to the intrinsic sizing that already
+// reads the attributes. Not for canvas: its attributes size the bitmap.
+void FrameReplaced::applySizeAttributesToAutoAxis(Length& width, Length& height)
+{
+    if (!node()->isHTMLImageElement() || width.isAuto() == height.isAuto()) {
+        return;
+    }
+    const auto& attributeSize =
+        computeIntrinsicSizeForLayout()
+            .m_intrinsicSizeIsSpecifiedByAttributeOfElement;
+    Element* element = node()->asElement();
+    auto strings = node()->starfish()->staticStrings();
+    if (width.isAuto() &&
+        !element->getAttributeOrEmpty(strings->m_width)->isEmpty()) {
+        width = attributeSize.first;
+    }
+    if (height.isAuto() &&
+        !element->getAttributeOrEmpty(strings->m_height)->isEmpty()) {
+        height = attributeSize.second;
+    }
+}
+
 bool FrameReplaced::hasPercentageWidthAttribute()
 {
     String* widthString = node()->asElement()->getAttributeOrEmpty(
@@ -307,6 +331,7 @@ void FrameReplaced::computeContentWidthAndHeight(LayoutContext& ctx,
     Length height = style()->height();
     LayoutUnit intrinsicWidth, intrinsicHeight;
     LayoutUnit parentContentWidth, parentContentHeight;
+    applySizeAttributesToAutoAxis(width, height);
     Length parentHeightLength;
     bool parentHasFixedHeight;
     bool hasAspectRatio;

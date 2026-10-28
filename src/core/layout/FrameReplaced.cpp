@@ -53,10 +53,10 @@ IntrinsicSizeUsedInLayout FrameReplaced::computeIntrinsicSizeForLayout()
     IntrinsicSize siz = intrinsicSize();
     IntrinsicSizeUsedInLayout result;
     result.m_hasAspectRatio = siz.m_hasAspectRatio;
-    String* widthString = node()->asElement()->getAttributeOrEmpty(
-        node()->starfish()->staticStrings()->m_width);
-    String* heightString = node()->asElement()->getAttributeOrEmpty(
-        node()->starfish()->staticStrings()->m_height);
+    String* widthString =
+        sizeAttribute(node()->starfish()->staticStrings()->m_width);
+    String* heightString =
+        sizeAttribute(node()->starfish()->staticStrings()->m_height);
     if (siz.m_isContentExists) {
         result.m_intrinsicContentSize =
             LayoutSize(siz.m_intrinsicContentSize.width(),
@@ -165,34 +165,21 @@ IntrinsicSizeUsedInLayout FrameReplaced::computeIntrinsicSizeForLayout()
     return result;
 }
 
-// An img's width and height attributes map to the 'width' and 'height'
-// properties (HTML 15.4.3), so when CSS sets only one axis the other still
-// takes its attribute. Both-auto is left to the intrinsic sizing that already
-// reads the attributes. Not for canvas: its attributes size the bitmap.
-void FrameReplaced::applySizeAttributesToAutoAxis(Length& width, Length& height)
+// img maps its width and height attributes to style instead (see
+// HTMLImageElement::styleForPresentationAttribute), so layout must not apply
+// them a second time.
+String* FrameReplaced::sizeAttribute(const QualifiedName& name)
 {
-    if (!node()->isHTMLImageElement() || width.isAuto() == height.isAuto()) {
-        return;
+    if (node()->isHTMLImageElement()) {
+        return String::emptyString;
     }
-    const auto& attributeSize =
-        computeIntrinsicSizeForLayout()
-            .m_intrinsicSizeIsSpecifiedByAttributeOfElement;
-    Element* element = node()->asElement();
-    auto strings = node()->starfish()->staticStrings();
-    if (width.isAuto() &&
-        !element->getAttributeOrEmpty(strings->m_width)->isEmpty()) {
-        width = attributeSize.first;
-    }
-    if (height.isAuto() &&
-        !element->getAttributeOrEmpty(strings->m_height)->isEmpty()) {
-        height = attributeSize.second;
-    }
+    return node()->asElement()->getAttributeOrEmpty(name);
 }
 
 bool FrameReplaced::hasPercentageWidthAttribute()
 {
-    String* widthString = node()->asElement()->getAttributeOrEmpty(
-        node()->starfish()->staticStrings()->m_width);
+    String* widthString =
+        sizeAttribute(node()->starfish()->staticStrings()->m_width);
     return !widthString->isEmpty() &&
            widthString->lastIndexOf('%') == widthString->length() - 1;
 }
@@ -331,7 +318,6 @@ void FrameReplaced::computeContentWidthAndHeight(LayoutContext& ctx,
     Length height = style()->height();
     LayoutUnit intrinsicWidth, intrinsicHeight;
     LayoutUnit parentContentWidth, parentContentHeight;
-    applySizeAttributesToAutoAxis(width, height);
     Length parentHeightLength;
     bool parentHasFixedHeight;
     bool hasAspectRatio;

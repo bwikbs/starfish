@@ -4556,7 +4556,6 @@ void FrameReplaced::computePreferredWidth(PreferredWidthContext& ctx)
     Length width = style()->width();
     Length height = style()->height();
     BoxSizingValue boxSizing = style()->boxSizing();
-    applySizeAttributesToAutoAxis(width, height);
     LayoutUnit intrinsicWidth, intrinsicHeight, w, h;
     FrameBox* cb = containingBlock(this);
     MBPRestorer restorer(this);
